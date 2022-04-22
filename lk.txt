@@ -1,0 +1,43 @@
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Drason1298@';
+
+CREATE DATABASE SCOPED CREDENTIAL SasToken
+WITH IDENTITY='SHARED ACCESS SIGNATURE'
+, SECRET = 'sp=racwdlmeop&st=2022-03-30T08:55:01Z&se=2022-03-30T16:55:01Z&spr=https&sv=2020-08-04&sr=c&sig=jcfOOl3qKJvWxbK70pJJSLSXcCLdOBZsFH9aG00Pq1Q%3D'
+
+CREATE EXTERNAL DATA SOURCE log_data
+WITH (    LOCATION   = 'https://n3mesisadls.dfs.core.windows.net/txns',
+          CREDENTIAL = SasToken
+)
+
+CREATE EXTERNAL FILE FORMAT TextFileFormat WITH (  
+      FORMAT_TYPE = DELIMITEDTEXT,  
+    FORMAT_OPTIONS (  
+        FIELD_TERMINATOR = ','
+		))
+
+CREATE EXTERNAL TABLE [txns]
+(
+    [Id] [int],
+	[Date] [varchar](200),
+	[Uid] [int],
+	[Amount] [float],
+	[Category] [varchar](100),
+	[Item] [varchar](100),
+	[City] [varchar](100),
+	[State] [varchar](100),
+	[Payment_Type] [varchar](200))
+WITH (
+ LOCATION = 'wallmart/txnsSmall',
+    DATA_SOURCE = log_data,  
+    FILE_FORMAT = TextFileFormat
+)
+
+select * from txns
+
+select Category,sum(Amount) as Total_revenue from txns group by Category
+
+select count(Payment_Type) as Cash_Payments from txns where Payment_Type = 'cash'
+
+select sum(Amount) as Credit_revenue from txns where Payment_Type = 'credit'
+
+select Category from txns group by Category order by sum(Amount) desc

@@ -1,0 +1,9 @@
+select avg(purchaseprice) as Average_Price from epschema.purchase;
+select max(purchaseprice) as Max_Price, min(purchaseprice) as Min_Price from epschema.purchase;
+select count(language) as English_Lang from epschema.purchase where language='en';
+select count(job) as Lawyers from epschema.purchase where job='%Lawyer%';
+select amorpm,count(amorpm) as Count from epschema.purchase group by amorpm;
+select job from epschema.purchase group by job order by count(job) desc limit 5;
+select purchaseprice from epschema.purchase where lot='90 WT';
+select email from epschema.purchase where creditcard='4926535242672853';
+select count(ccprovider) from epschema.purchase where ccprovider='American Express' and purchaseprice>'95';
